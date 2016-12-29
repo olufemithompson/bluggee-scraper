@@ -14,11 +14,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+
 
 import com.bluggee.blogs.BellaNaija;
 import com.bluggee.blogs.LindaIkeji;
+
+import facebook4j.FacebookException;
 
 
 
@@ -34,6 +35,13 @@ public class Application {
 	private Log logger = LogFactory.getLog(Application.class);
 	HttpClient httpClient;
 	String baseUrl;
+	
+	String fbId;
+	String fbSecret;
+	
+	
+	
+	
    long sourceId = 1;
 	public boolean isDebug() {
 		return isDebug;
@@ -58,6 +66,7 @@ public class Application {
 			}catch(Exception e){
 				System.out.println(e.getMessage());
 			}
+
 		
 		} else {
 			System.out.println("could not load properies file");
@@ -71,9 +80,14 @@ public class Application {
 	public Application(Properties properties) {
 		this.properties = properties;
 		baseUrl = properties.get("baseUrl").toString();
+		
+		fbId = properties.get("fbId").toString();
+		fbSecret = properties.get("fbSecret").toString();
+		
 		sourceId = Long.parseLong(properties.get("sourceId").toString());
 		dbConnection = getDbConnection();
 		httpClient = new DefaultHttpClient();
+
 	}
 	
 

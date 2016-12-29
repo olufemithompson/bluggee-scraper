@@ -121,8 +121,10 @@ public class Content extends DBObject{
 				"url," +
 				"original_url," +
 				"unique_id," +
-				"source_id" +
+				"source_id," +
+				"sitemap_completed" +
 				") values(")
+				  .append("?").append(",")
 				  .append("?").append(",")
 				  .append("?").append(",")
 				  .append("?").append(",")
@@ -167,6 +169,7 @@ public class Content extends DBObject{
 		preparedStatement.setString(5, originalUrl);
 		preparedStatement.setString(6, uniqueId);
 		preparedStatement.setLong(7, sourceId);
+		preparedStatement.setInt(8, 0);
 		
 		preparedStatement.executeUpdate();
 		int last_inserted_id = -1;
