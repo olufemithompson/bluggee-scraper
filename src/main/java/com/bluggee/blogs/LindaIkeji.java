@@ -21,6 +21,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.bluggee.Application;
 import com.bluggee.Content;
 import com.bluggee.DbConnection;
 import com.bluggee.Util;
@@ -98,6 +99,7 @@ public class LindaIkeji {
 			content.setUniqueId(shaString);
 			content.setUrl(url);
 			content.insert(dbConnection);
+			Application.addFeedMessage(content);
 		}
 		
 	}

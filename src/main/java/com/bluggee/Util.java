@@ -36,15 +36,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 
-import com.restfb.DefaultFacebookClient;
-import com.restfb.FacebookClient;
-import com.restfb.Parameter;
-import com.restfb.types.FacebookType;
 
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.auth.AccessToken;
 
 
 
@@ -54,7 +46,6 @@ public class Util {
 	static HashMap<String,String> cookies = new HashMap<String,String>();
 	public static String firefoxPath;
 	public static int numTries = 5;
-	static Facebook facebook;
 	
 	/**
 	 * causes the thread to wait for a specific amount of time
@@ -161,25 +152,6 @@ public class Util {
 	}
 
 	
-	public static void initFaceBook(String fbId, String fbSecret) throws FacebookException{
-		facebook = new FacebookFactory().getInstance();
-		facebook.setOAuthAppId(fbId, fbSecret);
-		facebook.setOAuthPermissions("publish_pages");
-		facebook.setOAuthAccessToken(facebook.getOAuthAccessToken("EAACEdEose0cBAN4RIVysEwStr3SRxrhNayOb6bQbIMfS0ZBtDsWerXImEBVDHGZASQSVXJznZAqyxzdeBSekDCymzgu4KqWIqsidbHqfmonrCmDftIrkehZAnDmArTX46nlM7lyzFzdIOTRjkx4DD0VRJZAXs80hb2ox4DRhotAZDZD",null));
-	}
 	
-	
-	
-	
-	public static void postToFacebook(String link) throws MalformedURLException, FacebookException{
-		//facebook.postStatusMessage("Hello World from Facebook4J.");
-		
-		
-		FacebookClient facebookClient = new DefaultFacebookClient("555586027980853|ynWus9nLJuf0X4NNLG5ahGp1XD0");
-	
-		FacebookType publishMessageResponse = facebookClient.publish("/546349135390552/feed", FacebookType.class, Parameter.with("link", link));
-		//facebook.postLink(new URL(link));
-	}
-
 	
 }

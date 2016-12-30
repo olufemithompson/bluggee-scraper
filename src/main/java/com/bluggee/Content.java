@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class Content extends DBObject{
@@ -16,6 +18,9 @@ public class Content extends DBObject{
 	String originalUrl;
 	String uniqueId;
 	long sourceId;
+	
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	
 	
 	public void reset(){
 		title="";
@@ -122,8 +127,10 @@ public class Content extends DBObject{
 				"original_url," +
 				"unique_id," +
 				"source_id," +
-				"sitemap_completed" +
+				"sitemap_completed," +
+				"saved_date" +
 				") values(")
+				  .append("?").append(",")
 				  .append("?").append(",")
 				  .append("?").append(",")
 				  .append("?").append(",")
@@ -170,6 +177,7 @@ public class Content extends DBObject{
 		preparedStatement.setString(6, uniqueId);
 		preparedStatement.setLong(7, sourceId);
 		preparedStatement.setInt(8, 0);
+		preparedStatement.setString(9, sdf.format(new Date()));
 		
 		preparedStatement.executeUpdate();
 		int last_inserted_id = -1;
