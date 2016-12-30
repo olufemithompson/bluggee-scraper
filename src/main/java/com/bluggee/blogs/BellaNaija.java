@@ -89,7 +89,7 @@ public class BellaNaija {
 	
 	private void insertData(String title, String image, String link, String desc) throws SQLException, NoSuchAlgorithmException, UnsupportedEncodingException{
 		String shaString = Util.generateSha1String(title);
-		String url = baseUrl+shaString+"/"+Util.formatTitle(title);
+		String url = baseUrl+"post/"+shaString+"/"+Util.formatTitle(title);
 		if(!Content.isPresent(dbConnection, shaString)){
 			content.reset();
 			
