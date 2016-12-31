@@ -22,6 +22,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.bluggee.Application;
+import com.bluggee.Blog;
 import com.bluggee.Content;
 import com.bluggee.DbConnection;
 import com.bluggee.Util;
@@ -29,19 +30,16 @@ import com.bluggee.Util;
 
 
 
-public class Naij {
+public class Naij extends Blog {
 
 
 	public String page;
 
-	DbConnection dbConnection;
 	Properties properties;
 	Boolean isDebug = true;
 	private Log logger = LogFactory.getLog(Naij.class);
-	String baseUrl;
-	Content content;
+
 	HttpClient httpClient;
-	private long sourceId = 3;
 
 	public boolean isDebug() {
 		return isDebug;
@@ -52,12 +50,11 @@ public class Naij {
 		dbConnection = dbCon;
 		httpClient = httpCli;
 		isDebug = debug;
-		content = new Content();
 		this.sourceId=sourceId;
 		this.baseUrl = baseUrl;
 	}
 	
-
+	@Override
 	public void run() {
 		Util.logToConsole(isDebug(), logger,"downloading contents  from Naij",false);
 		getForLinks("https://www.naij.com/latest/");
@@ -96,20 +93,4 @@ public class Naij {
 		}
 	}
 	
-	private void insertData(String title, String image, String link, String desc) throws SQLException, NoSuchAlgorithmException, UnsupportedEncodingException{
-		String shaString = Util.generateSha1String(title);
-		String url = baseUrl+"post/"+shaString+"/"+Util.formatTitle(title);
-		if(!Content.isPresent(dbConnection, shaString)){
-			content.reset();
-			content.setDescription(desc);
-			content.setImage(image);
-			content.setOriginalUrl(link);
-			content.setSourceId(sourceId);
-			content.setTitle(title);
-			content.setUniqueId(shaString);
-			content.setUrl(url);
-			content.insert(dbConnection);
-		}
-		
-	}
 }

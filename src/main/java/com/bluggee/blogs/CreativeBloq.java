@@ -30,16 +30,14 @@ import com.bluggee.Util;
 
 
 
-public class BellaNaija extends Blog{
+public class CreativeBloq extends Blog {
 
 
 	public String page;
 
-	
 	Properties properties;
 	Boolean isDebug = true;
-	private Log logger = LogFactory.getLog(BellaNaija.class);
-	
+	private Log logger = LogFactory.getLog(CreativeBloq.class);
 	HttpClient httpClient;
 
 	public boolean isDebug() {
@@ -47,7 +45,7 @@ public class BellaNaija extends Blog{
 	}
 
 	
-	public BellaNaija(DbConnection dbCon,HttpClient httpCli, String baseUrl,long sourceId, boolean debug) {
+	public CreativeBloq(DbConnection dbCon,HttpClient httpCli, String baseUrl,long sourceId, boolean debug) {
 		dbConnection = dbCon;
 		httpClient = httpCli;
 		isDebug = debug;
@@ -55,34 +53,42 @@ public class BellaNaija extends Blog{
 		this.baseUrl = baseUrl;
 	}
 	
-
 	@Override
 	public void run() {
-		Util.logToConsole(isDebug(), logger,"downloading contents  from bella naija",false);
+		Util.logToConsole(isDebug(), logger,"downloading contents  from Creative Bloq",false);
+		getForLinks("http://www.creativebloq.com/advice");
+		getForLinks("http://www.creativebloq.com/news");
+		getForLinks("http://www.creativebloq.com/reviews");
+		getForLinks("http://www.creativebloq.com/features");
+		getForLinks("http://www.creativebloq.com/inspiration");
 		
+		
+		
+		
+	}
+	
+	
+	private void getForLinks(String link){
 		try {
-			page = Util.downloadPage("https://www.bellanaija.com/", httpClient);
+			page = Util.downloadPage(link, httpClient);
 			Document doc = Jsoup.parse(page);
-			Elements divs = doc.getElementsByClass("home-feature-story");
+			Elements divs = doc.getElementsByClass("listingResult");
 			for(Element div  : divs){
-				String image = div.select("img").attr("src");
-				String title = div.getElementsByTag("h3").get(0).select("a").text();
-				String originalUrl = div.getElementsByTag("h3").get(0).select("a").attr("href");
-				String desc = div.getElementsByTag("footer").text();
-				desc = desc.substring(0,desc.indexOf("Continue love this"));
+				String image = div.getElementsByClass("article-lead-image-wrap").attr("data-original");
+				String title = div.getElementsByClass("article-name").text();
+				String originalUrl = div.select("a").attr("href");
+				String desc = div.getElementsByClass("synopsis").text();
 				insertData(title,image,originalUrl,desc);
 			}
 			
 			
 		} catch (ClientProtocolException e) {
-			Util.logToConsole(isDebug(), logger,"could not download content from linda ikeji",true);
+			Util.logToConsole(isDebug(), logger,"could not download content from Creative Bloq",true);
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		}
-		
 	}
-	
-	
+
 }

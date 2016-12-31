@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -33,7 +35,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 
 
+
+
+
 import com.bluggee.blogs.BellaNaija;
+import com.bluggee.blogs.CreativeBloq;
 import com.bluggee.blogs.LindaIkeji;
 import com.bluggee.blogs.Naij;
 import com.bluggee.blogs.TechCabal;
@@ -63,6 +69,9 @@ public class Application {
 	
     long sourceId = 1;
    
+    
+    static ArrayList<Blog> blogs = new ArrayList<Blog>();
+    static ArrayList<Content> contents = new ArrayList<Content>();
 
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
@@ -132,7 +141,15 @@ public class Application {
 		dbConnection = getDbConnection(properties);
 		httpClient = new DefaultHttpClient();
 		
-
+		blogs.add(new LindaIkeji(dbConnection, httpClient,baseUrl, 1, isDebug));
+		blogs.add(new BellaNaija(dbConnection, httpClient,baseUrl, 2, isDebug));
+		blogs.add(new Naij(dbConnection, httpClient,baseUrl,3, isDebug));
+		blogs.add(new TechCabal(dbConnection, httpClient,baseUrl,4, isDebug));
+		blogs.add(new TechPoint(dbConnection, httpClient,baseUrl,5, isDebug));
+		blogs.add(new CreativeBloq(dbConnection, httpClient,baseUrl,6, isDebug));
+		
+		
+	
 	}
 	
 
@@ -159,24 +176,22 @@ public class Application {
 	
 
 	public static void run(){
-		LindaIkeji lindaIkeji = new LindaIkeji(dbConnection, httpClient,baseUrl, 1, isDebug);
-		lindaIkeji.run();
 		
+		for(Blog b : blogs){
+			b.run();
+			contents.addAll(b.getContents());
+		}
 		
-		BellaNaija bellaNaija = new BellaNaija(dbConnection, httpClient,baseUrl, 2, isDebug);
-		bellaNaija.run();
+		Collections.shuffle(contents);
+		for(Content content : contents){
+			try {
+				content.insert(dbConnection);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
-		
-		Naij naij = new Naij(dbConnection, httpClient,baseUrl,3, isDebug);
-		naij.run();
-		
-		
-		TechCabal tc = new TechCabal(dbConnection, httpClient,baseUrl,4, isDebug);
-		tc.run();
-		
-		
-		TechPoint tp = new TechPoint(dbConnection, httpClient,baseUrl,5, isDebug);
-		tp.run();
 		
 		try {
 			getLastItems();

@@ -22,6 +22,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.bluggee.Application;
+import com.bluggee.Blog;
 import com.bluggee.Content;
 import com.bluggee.DbConnection;
 import com.bluggee.Util;
@@ -29,7 +30,7 @@ import com.bluggee.Util;
 
 
 
-public class LindaIkeji {
+public class LindaIkeji extends Blog {
 
 
 	public String page;
@@ -39,9 +40,8 @@ public class LindaIkeji {
 	Boolean isDebug = true;
 	private Log logger = LogFactory.getLog(LindaIkeji.class);
 	String baseUrl;
-	Content content;
 	HttpClient httpClient;
-	private long sourceId = 1;
+	
 
 	public boolean isDebug() {
 		return isDebug;
@@ -52,12 +52,11 @@ public class LindaIkeji {
 		dbConnection = dbCon;
 		httpClient = httpCli;
 		isDebug = debug;
-		content = new Content();
 		this.sourceId=sourceId;
 		this.baseUrl = baseUrl;
 	}
 	
-
+	@Override
 	public void run() {
 		Util.logToConsole(isDebug(), logger,"downloading contents  from linda ikeji",false);
 		
@@ -86,20 +85,5 @@ public class LindaIkeji {
 	
 	
 	
-	private void insertData(String title, String image, String link, String desc) throws SQLException, NoSuchAlgorithmException, UnsupportedEncodingException{
-		String shaString = Util.generateSha1String(title);
-		String url = baseUrl+"post/"+shaString+"/"+Util.formatTitle(title);
-		if(!Content.isPresent(dbConnection, shaString)){
-			content.reset();
-			content.setDescription(desc);
-			content.setImage(image);
-			content.setOriginalUrl(link);
-			content.setSourceId(sourceId);
-			content.setTitle(title);
-			content.setUniqueId(shaString);
-			content.setUrl(url);
-			content.insert(dbConnection);
-		}
-		
-	}
+	
 }
