@@ -30,8 +30,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 
 
+
+
+
 import com.bluggee.blogs.BellaNaija;
 import com.bluggee.blogs.LindaIkeji;
+import com.bluggee.blogs.Naij;
+import com.bluggee.blogs.TechCabal;
+import com.bluggee.blogs.TechPoint;
 import com.bluggee.rss.Feed;
 import com.bluggee.rss.FeedMessage;
 import com.bluggee.rss.RSSFeedWriter;
@@ -153,12 +159,24 @@ public class Application {
 	
 
 	public static void run(){
-		LindaIkeji lindaIkeji = new LindaIkeji(dbConnection, httpClient,baseUrl, 1, isDebug);
-		lindaIkeji.run();
+//		LindaIkeji lindaIkeji = new LindaIkeji(dbConnection, httpClient,baseUrl, 1, isDebug);
+//		lindaIkeji.run();
+//		
+//		
+//		BellaNaija bellaNaija = new BellaNaija(dbConnection, httpClient,baseUrl, 2, isDebug);
+//		bellaNaija.run();
 		
 		
-		BellaNaija bellaNaija = new BellaNaija(dbConnection, httpClient,baseUrl, 2, isDebug);
-		bellaNaija.run();
+//		Naij naij = new Naij(dbConnection, httpClient,baseUrl,3, isDebug);
+//		naij.run();
+//		
+//		
+//		TechCabal tc = new TechCabal(dbConnection, httpClient,baseUrl,4, isDebug);
+//		tc.run();
+		
+		
+		TechPoint tp = new TechPoint(dbConnection, httpClient,baseUrl,5, isDebug);
+		tp.run();
 		
 		try {
 			getLastItems();
