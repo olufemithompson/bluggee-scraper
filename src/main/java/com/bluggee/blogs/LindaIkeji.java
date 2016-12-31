@@ -99,7 +99,6 @@ public class LindaIkeji {
 			content.setUniqueId(shaString);
 			content.setUrl(url);
 			content.insert(dbConnection);
-			Application.addFeedMessage(content);
 		}
 		
 	}

@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class Content extends DBObject{
@@ -160,6 +162,30 @@ public class Content extends DBObject{
 			dbConnection.close();
 		}
 		return hasNext;
+	}
+	
+	
+	public static List<Content> getContactLinks(DbConnection connection) throws SQLException{
+	    List<Content>  links = new ArrayList<Content>();
+		Connection dbConnection = null;
+		dbConnection = getDBConnection(connection);
+		Statement statement = dbConnection.createStatement();
+
+		ResultSet rs = statement.executeQuery("select * from content order by id DESC limit 500");
+		while (rs.next()) {
+			Content cont = new Content();
+			cont.setTitle(rs.getString("title"));
+			cont.setDescription(rs.getString("description"));
+			cont.setUrl(rs.getString("url"));
+			links.add(cont);
+		}
+		if (statement != null) {
+			statement.close();
+		}
+		if (dbConnection != null) {
+			dbConnection.close();
+		}
+		return links;
 	}
 	
 	

@@ -103,7 +103,7 @@ public class BellaNaija {
 			content.setUrl(url);
 			content.insert(dbConnection);
 			
-			Application.addFeedMessage(content);
+			
 		}
 		
 	}

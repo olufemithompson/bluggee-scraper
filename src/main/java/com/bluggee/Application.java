@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -18,6 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+
 
 
 
@@ -107,7 +110,7 @@ public class Application {
 		  FeedMessage feed = new FeedMessage();
           feed.setTitle(content.getTitle());
           feed.setDescription(content.getDescription());
-          feed.setAuthor("rss@bluggee.com content.getUrl()");
+          feed.setAuthor("rss@bluggee.com bluggee");
           feed.setGuid(content.getUrl());
           feed.setLink(content.getUrl());
           rssFeed.getMessages().add(feed);
@@ -157,8 +160,22 @@ public class Application {
 		BellaNaija bellaNaija = new BellaNaija(dbConnection, httpClient,baseUrl, 2, isDebug);
 		bellaNaija.run();
 		
+		try {
+			getLastItems();
+			writeRss();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
-		writeRss();
+	}
+	
+	
+	
+	public static void getLastItems() throws SQLException{
+		List<Content> contents = Content.getContactLinks(dbConnection);
+		for(Content content : contents){
+			addFeedMessage(content);
+		}
 	}
 	
 	
