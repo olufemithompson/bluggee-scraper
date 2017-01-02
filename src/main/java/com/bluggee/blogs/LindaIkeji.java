@@ -35,7 +35,6 @@ public class LindaIkeji extends Blog {
 
 	public String page;
 
-	DbConnection dbConnection;
 	Properties properties;
 	Boolean isDebug = true;
 	private Log logger = LogFactory.getLog(LindaIkeji.class);
@@ -76,9 +75,9 @@ public class LindaIkeji extends Blog {
 		} catch (ClientProtocolException e) {
 			Util.logToConsole(isDebug(), logger,"could not download content from linda ikeji",true);
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		}
 		
 	}
