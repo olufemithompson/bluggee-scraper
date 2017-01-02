@@ -62,9 +62,6 @@ public class CreativeBloq extends Blog {
 		getForLinks("http://www.creativebloq.com/features");
 		getForLinks("http://www.creativebloq.com/inspiration");
 		
-		
-		
-		
 	}
 	
 	

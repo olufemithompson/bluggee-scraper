@@ -38,7 +38,7 @@ public class LindaIkeji extends Blog {
 	Properties properties;
 	Boolean isDebug = true;
 	private Log logger = LogFactory.getLog(LindaIkeji.class);
-	String baseUrl;
+
 	HttpClient httpClient;
 	
 
