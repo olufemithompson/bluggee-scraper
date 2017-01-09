@@ -23,6 +23,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 
@@ -42,6 +44,7 @@ import com.bluggee.blogs.BellaNaija;
 import com.bluggee.blogs.CreativeBloq;
 import com.bluggee.blogs.LindaIkeji;
 import com.bluggee.blogs.Naij;
+import com.bluggee.blogs.TMZ;
 import com.bluggee.blogs.TechCabal;
 import com.bluggee.blogs.TechPoint;
 import com.bluggee.rss.Feed;
@@ -146,8 +149,7 @@ public class Application {
 		blogs.add(new Naij(dbConnection, httpClient,baseUrl,3, isDebug));
 		blogs.add(new TechCabal(dbConnection, httpClient,baseUrl,4, isDebug));
 		blogs.add(new TechPoint(dbConnection, httpClient,baseUrl,5, isDebug));
-		blogs.add(new CreativeBloq(dbConnection, httpClient,baseUrl,6, isDebug));
-		
+		blogs.add(new TMZ(dbConnection, httpClient,baseUrl,7, isDebug));
 		
 	
 	}
