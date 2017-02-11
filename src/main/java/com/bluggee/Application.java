@@ -40,10 +40,22 @@ import org.json.JSONObject;
 
 
 
+
+
+
+
+
+
 import com.bluggee.blogs.BellaNaija;
+import com.bluggee.blogs.Charlies;
 import com.bluggee.blogs.CreativeBloq;
+import com.bluggee.blogs.Jaguda;
 import com.bluggee.blogs.LindaIkeji;
+import com.bluggee.blogs.Mp3naija;
 import com.bluggee.blogs.Naij;
+import com.bluggee.blogs.Notjustok;
+import com.bluggee.blogs.Onobello;
+import com.bluggee.blogs.Stylevitae;
 import com.bluggee.blogs.TMZ;
 import com.bluggee.blogs.TechCabal;
 import com.bluggee.blogs.TechPoint;
@@ -150,8 +162,12 @@ public class Application {
 		blogs.add(new TechCabal(dbConnection, httpClient,baseUrl,4, isDebug));
 		blogs.add(new TechPoint(dbConnection, httpClient,baseUrl,5, isDebug));
 		blogs.add(new TMZ(dbConnection, httpClient,baseUrl,7, isDebug));
-		
-	
+		blogs.add(new Charlies(dbConnection, httpClient,baseUrl,8, isDebug));
+		blogs.add(new Onobello(dbConnection, httpClient,baseUrl,9, isDebug));
+		blogs.add(new Stylevitae(dbConnection, httpClient,baseUrl,10, isDebug));
+		blogs.add(new Jaguda(dbConnection, httpClient,baseUrl,11, isDebug));
+		blogs.add(new Mp3naija(dbConnection, httpClient,baseUrl,12, isDebug));
+		blogs.add(new Notjustok(dbConnection, httpClient,baseUrl,13, isDebug));
 	}
 	
 
