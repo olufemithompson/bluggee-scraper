@@ -244,7 +244,7 @@ public class Application {
 	
 	public static void doNotification(){
 		ArrayList<String> regs = getRegIds();
-		if(regs.size() > 0){
+		if(regs.size() > 0 && contents.size() > 0){
 			JSONArray array = new JSONArray();
 			for(String reg : regs){
 				array.put(reg);
