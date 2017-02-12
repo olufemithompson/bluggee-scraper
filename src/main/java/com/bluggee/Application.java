@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,11 +23,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+
+
+
+
+
+
+
 
 
 
@@ -203,7 +220,8 @@ public class Application {
 		Collections.shuffle(contents);
 		for(Content content : contents){
 			try {
-				content.insert(dbConnection);
+				int id = content.insert(dbConnection);
+				content.setId(id);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -218,6 +236,197 @@ public class Application {
 			e.printStackTrace();
 		}
 		
+		
+		doNotification();
+		
+	}
+	
+	
+	public static void doNotification(){
+		ArrayList<String> regs = getRegIds();
+		if(regs.size() > 0){
+			JSONArray array = new JSONArray();
+			for(String reg : regs){
+				array.put(reg);
+			}
+			
+			
+			JSONObject json = new JSONObject();
+			JSONObject data = new JSONObject();
+			
+			json.put("registration_ids", array);
+			StringBuilder titleBuilder = new StringBuilder();
+			StringBuilder urlBuilder = new StringBuilder();
+			StringBuilder idBuilder = new StringBuilder();
+			StringBuilder imageBuilder = new StringBuilder();
+			StringBuilder srcBuilder = new StringBuilder();
+			StringBuilder srcIdBuilder = new StringBuilder();
+			
+			
+			for(int i = 0; i < contents.size(); i++){
+				Content c= contents.get(i);
+				
+				titleBuilder.append(c.getTitle());
+				if(i < contents.size()-1){
+					titleBuilder.append("<>");
+				}
+				
+				urlBuilder.append(c.getUrl());
+				if(i < contents.size()-1){
+					urlBuilder.append("<>");
+				}
+				
+				idBuilder.append(Long.toString(c.getId()));
+				if(i < contents.size()-1){
+					idBuilder.append("<>");
+				}
+				
+				imageBuilder.append(c.getImage());
+				if(i < contents.size()-1){
+					imageBuilder.append("<>");
+				}
+				
+				srcIdBuilder.append(Long.toString(c.getSourceId()));
+				if(i < contents.size()-1){
+					srcIdBuilder.append("<>");
+				}
+				
+				String src = getSourceName(c.getSourceId());
+				
+				srcBuilder.append(src);
+				if(i < contents.size()-1){
+					srcBuilder.append("<>");
+				}
+				
+			}
+			
+			
+			data.put("titles", titleBuilder.toString());
+			data.put("ids", idBuilder.toString());
+			data.put("images", imageBuilder.toString());
+			data.put("urls", urlBuilder.toString());
+			data.put("sources", srcBuilder.toString());
+			data.put("sourceIds", srcIdBuilder.toString());
+			
+			data.put("title", "New stories from bluggee");
+			data.put("message", "New stories from bluggee");
+			data.put("total", Integer.toString(contents.size()));
+			json.put("data", data);
+			
+
+			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			try {
+			    HttpPost request = new HttpPost("https://android.googleapis.com/gcm/send");
+			    StringEntity params = new StringEntity(json.toString());
+			    request.addHeader("content-type", "application/json");
+			    request.addHeader("Authorization", "key= AAAACodgkGY:APA91bFdzSHdEQ7-BSJK24DE80hzjoAwoztTl_awYPCl5BvGV5-xu8ZRjeMf_P9v9bPArEEot47SpUko3k_2EDIm-sMSsRgkMDg1dM6BrXrZZcC9abVYoNvHE-_XdBvUsynsRD2VIzQp");
+			    request.setEntity(params);
+			    CloseableHttpResponse resp =  httpClient.execute(request);
+			    String responseString = EntityUtils.toString(resp.getEntity(),"UTF-8");
+			} catch (Exception ex) {
+				
+			} finally {
+			    try {
+					httpClient.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	
+	private static ArrayList<String> getRegIds(){
+		ArrayList<String> regs = new ArrayList<String>();
+		Connection connection = null;
+		try {
+			connection = DBObject.getDBConnection(dbConnection);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rs = statement.executeQuery("select reg from reg_id");
+			while (rs.next()) {
+				regs.add( rs.getString("reg"));
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		if (statement != null) {
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (connection != null) {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return regs;
+	}
+	
+	
+	
+	
+	private static String getSourceName(long id){
+		String name = "";
+		Connection connection = null;
+		try {
+			connection = DBObject.getDBConnection(dbConnection);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Statement statement = null;
+		try {
+			statement = connection.createStatement();
+			ResultSet rs = statement.executeQuery("select name from blog_source where id = "+id);
+			while (rs.next()) {
+				name = rs.getString("name");
+				
+				break;
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		if (statement != null) {
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (connection != null) {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return name;
 	}
 	
 	

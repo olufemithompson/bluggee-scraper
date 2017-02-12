@@ -12,7 +12,7 @@ import java.util.List;
 
 
 public class Content extends DBObject{
-	
+	long id;
 	String title;
 	String description;
 	String image;
@@ -118,6 +118,20 @@ public class Content extends DBObject{
 	}
 
 
+	
+	
+
+	public long getId() {
+		return id;
+	}
+
+
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+
 
 	public String getInsertSql(){
 		StringBuilder sqlBuilder = new StringBuilder();
@@ -187,6 +201,7 @@ public class Content extends DBObject{
 		}
 		return links;
 	}
+	
 	
 	
 	public int insert(DbConnection connection) throws SQLException {
