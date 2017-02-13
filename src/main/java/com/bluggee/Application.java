@@ -257,6 +257,7 @@ public class Application {
 			json.put("registration_ids", array);
 			StringBuilder titleBuilder = new StringBuilder();
 			StringBuilder urlBuilder = new StringBuilder();
+			StringBuilder ourlBuilder = new StringBuilder();
 			StringBuilder idBuilder = new StringBuilder();
 			StringBuilder imageBuilder = new StringBuilder();
 			StringBuilder srcBuilder = new StringBuilder();
@@ -275,6 +276,12 @@ public class Application {
 				if(i < contents.size()-1){
 					urlBuilder.append("<>");
 				}
+				
+				ourlBuilder.append(c.getOriginalUrl());
+				if(i < contents.size()-1){
+					ourlBuilder.append("<>");
+				}
+				
 				
 				idBuilder.append(Long.toString(c.getId()));
 				if(i < contents.size()-1){
@@ -305,6 +312,7 @@ public class Application {
 			data.put("ids", idBuilder.toString());
 			data.put("images", imageBuilder.toString());
 			data.put("urls", urlBuilder.toString());
+			data.put("ourls", ourlBuilder.toString());
 			data.put("sources", srcBuilder.toString());
 			data.put("sourceIds", srcIdBuilder.toString());
 			
