@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.ClientProtocolException;
@@ -32,36 +35,20 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.PageRequest;
 
 import com.bluggee.blogs.BellaNaija;
 import com.bluggee.blogs.Charlies;
@@ -76,6 +63,7 @@ import com.bluggee.blogs.Stylevitae;
 import com.bluggee.blogs.TMZ;
 import com.bluggee.blogs.TechCabal;
 import com.bluggee.blogs.TechPoint;
+import com.bluggee.models.Content;
 import com.bluggee.rss.Feed;
 import com.bluggee.rss.FeedMessage;
 import com.bluggee.rss.RSSFeedWriter;
@@ -83,47 +71,48 @@ import com.bluggee.rss.RSSFeedWriter;
 
 
 
-
-public class Application {
+@SpringBootApplication
+public class Application implements CommandLineRunner{
 
 
 	public String page;
 
 	static DbConnection dbConnection;
-	static Boolean isDebug = true;
-	static HttpClient httpClient;
-	static String baseUrl;
-	static String rssDirectory;
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+	
+    Boolean isDebug = true;
+	
+     HttpClient httpClient;
+	
+	@Value("${baseUrl}")
+    String baseUrl;
+	
+	@Value("${rssDirectory}")
+	String rssDirectory;
 	
 	
-	public static Feed rssFeed;
+	public  Feed rssFeed;
 	
+	
+	 @Autowired
+	 BeanFactory beanFactory;
+	
+	@Autowired
+	ContentRepository repository;
 	
     long sourceId = 1;
    
     
     static ArrayList<Blog> blogs = new ArrayList<Blog>();
+    
     static ArrayList<Content> contents = new ArrayList<Content>();
 
-	public static void main(String[] args) throws IOException,
-			InterruptedException {
-		Properties properties = new Properties();
-		InputStream input = null;
-		
-		
-		
-		try {
-			input = new FileInputStream("config.properties");
-			properties.load(input);
-		} catch (IOException e) {
-			properties = null;
-			e.printStackTrace();
-		}
-		
-		
-		
-		
-		String copyright = "Copyright hold by bluggee";
+    @Override
+    public void run(String... args) throws Exception {
+	
+    	String copyright = "Copyright hold by bluggee";
         String title = "Streams of blogs in one place";
         String description = "Streams of blogs in one place";
         String language = "en";
@@ -136,24 +125,30 @@ public class Application {
         rssFeed = new Feed(title, link, description, language,
                         copyright, pubdate);
         
-        if (properties != null) {
-			init(properties);
-			try{
-				run();
-			}catch(Exception e){
-				System.out.println(e.getMessage());
-			}
-			
-
-		
-		} else {
-			System.out.println("could not load properies file");
+        
+        init();
+        try{
+			doRun(args.length > 0);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
 		}
+       
+    }
+    
+    
+    @Bean
+    public Blog createBlog(){
+    	return new Blog();
+    }
+    
+    
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args).close();
 	}
 
 	
 	
-	public static void addFeedMessage(Content content){
+	public void addFeedMessage(Content content){
 		  FeedMessage feed = new FeedMessage();
           feed.setTitle(content.getTitle());
           feed.setDescription(content.getDescription());
@@ -166,29 +161,41 @@ public class Application {
 	
 	
 
-	public static void init(Properties properties) {
-		
-		baseUrl = properties.get("baseUrl").toString();
-		rssDirectory = properties.get("rssDirectory").toString();
-		dbConnection = getDbConnection(properties);
+	public  void init() {
 		httpClient = new DefaultHttpClient();
-		
-		blogs.add(new LindaIkeji(dbConnection, httpClient,baseUrl, 1, isDebug));
-		blogs.add(new BellaNaija(dbConnection, httpClient,baseUrl, 2, isDebug));
-		blogs.add(new Naij(dbConnection, httpClient,baseUrl,3, isDebug));
-		blogs.add(new TechCabal(dbConnection, httpClient,baseUrl,4, isDebug));
-		blogs.add(new TechPoint(dbConnection, httpClient,baseUrl,5, isDebug));
-		blogs.add(new TMZ(dbConnection, httpClient,baseUrl,7, isDebug));
-		blogs.add(new Charlies(dbConnection, httpClient,baseUrl,8, isDebug));
-		blogs.add(new Onobello(dbConnection, httpClient,baseUrl,9, isDebug));
-		blogs.add(new Stylevitae(dbConnection, httpClient,baseUrl,10, isDebug));
-		blogs.add(new Jaguda(dbConnection, httpClient,baseUrl,11, isDebug));
-		blogs.add(new Mp3naija(dbConnection, httpClient,baseUrl,12, isDebug));
-		blogs.add(new Notjustok(dbConnection, httpClient,baseUrl,13, isDebug));
+		blogs.add(beanFactory.getBean(LindaIkeji.class,httpClient,baseUrl, 1, isDebug));
+		blogs.add(beanFactory.getBean(BellaNaija.class,httpClient,baseUrl, 2, isDebug));
+		blogs.add(beanFactory.getBean(Naij.class,httpClient,baseUrl,3, isDebug));
+		blogs.add(beanFactory.getBean(TechCabal.class,httpClient,baseUrl,4, isDebug));
+		blogs.add(beanFactory.getBean(TechPoint.class,httpClient,baseUrl,5, isDebug));
+		blogs.add(beanFactory.getBean(TMZ.class,httpClient,baseUrl,7, isDebug));
+		blogs.add(beanFactory.getBean(Charlies.class, httpClient,baseUrl,8, isDebug));
+		blogs.add(beanFactory.getBean(Onobello.class, httpClient,baseUrl,9, isDebug));
+		blogs.add(beanFactory.getBean(Stylevitae.class,httpClient,baseUrl,10, isDebug));
+		blogs.add(beanFactory.getBean(Jaguda.class,httpClient,baseUrl,11, isDebug));
+		blogs.add(beanFactory.getBean(Mp3naija.class, httpClient,baseUrl,12, isDebug));
+		blogs.add(beanFactory.getBean(Notjustok.class,httpClient,baseUrl,13, isDebug));
 	}
 	
 
 
+	
+	public void reindex(){
+		try {
+			 System.out.println("reindexing data");
+		      FullTextEntityManager fullTextEntityManager =
+		      Search.getFullTextEntityManager(entityManager);
+		      fullTextEntityManager.createIndexer().startAndWait();
+		      fullTextEntityManager.flushToIndexes();
+		      System.out.println("finish reindexing data");
+		      
+		    }
+		    catch (InterruptedException e) {
+		      System.out.println(
+		        "An error occurred trying to build the serach index: " +
+		         e.toString());
+		    }
+	}
 	
 	
 	/**
@@ -198,7 +205,7 @@ public class Application {
 	 * @param prefix
 	 * @return
 	 */
-	public static DbConnection getDbConnection(Properties properties) {
+	public  DbConnection getDbConnection(Properties properties) {
 		String host = properties.get("host").toString();
 		String port = properties.get("port").toString();
 		String user = properties.get("user").toString();
@@ -210,7 +217,7 @@ public class Application {
 
 	
 
-	public static void run(){
+	public void doRun(boolean reindex){
 		
 		for(Blog b : blogs){
 			b.run();
@@ -219,13 +226,11 @@ public class Application {
 		
 		Collections.shuffle(contents);
 		for(Content content : contents){
-			try {
-				int id = content.insert(dbConnection);
-				content.setId(id);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			repository.save(content);
+		}
+		
+		if(reindex){
+			reindex();
 		}
 		
 		
@@ -242,7 +247,7 @@ public class Application {
 	}
 	
 	
-	public static void doNotification(){
+	public  void doNotification(){
 		ArrayList<String> regs = getRegIds();
 		if(regs.size() > 0 && contents.size() > 0){
 			JSONArray array = new JSONArray();
@@ -281,6 +286,7 @@ public class Application {
 				if(i < contents.size()-1){
 					ourlBuilder.append("<>");
 				}
+
 				
 				
 				idBuilder.append(Long.toString(c.getId()));
@@ -293,12 +299,12 @@ public class Application {
 					imageBuilder.append("<>");
 				}
 				
-				srcIdBuilder.append(Long.toString(c.getSourceId()));
+				srcIdBuilder.append(Long.toString(c.getSource().getId()));
 				if(i < contents.size()-1){
 					srcIdBuilder.append("<>");
 				}
 				
-				String src = getSourceName(c.getSourceId());
+				String src = getSourceName(c.getSource().getId());
 				
 				srcBuilder.append(src);
 				if(i < contents.size()-1){
@@ -345,7 +351,7 @@ public class Application {
 	}
 	
 	
-	private static ArrayList<String> getRegIds(){
+	private  ArrayList<String> getRegIds(){
 		ArrayList<String> regs = new ArrayList<String>();
 		Connection connection = null;
 		try {
@@ -391,7 +397,7 @@ public class Application {
 	
 	
 	
-	private static String getSourceName(long id){
+	private  String getSourceName(long id){
 		String name = "";
 		Connection connection = null;
 		try {
@@ -439,15 +445,16 @@ public class Application {
 	
 	
 	
-	public static void getLastItems() throws SQLException{
-		List<Content> contents = Content.getContactLinks(dbConnection);
+	public  void getLastItems() throws SQLException{
+	    PageRequest pageable = new PageRequest(0,500);
+		List<Content> contents = repository.list(pageable);
 		for(Content content : contents){
 			addFeedMessage(content);
 		}
 	}
 	
 	
-	public static void writeRss(){
+	public  void writeRss(){
 		
 		File file = new File(rssDirectory, "rss.rss");
 		RSSFeedWriter writer = new RSSFeedWriter(rssFeed, file.getAbsolutePath());

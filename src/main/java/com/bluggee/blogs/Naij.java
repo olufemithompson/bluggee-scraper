@@ -20,16 +20,19 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import com.bluggee.Application;
 import com.bluggee.Blog;
-import com.bluggee.Content;
 import com.bluggee.DbConnection;
 import com.bluggee.Util;
+import com.bluggee.models.Content;
 
 
 
-
+@Service
+@Scope(value = "prototype")
 public class Naij extends Blog {
 
 
@@ -46,8 +49,8 @@ public class Naij extends Blog {
 	}
 
 	
-	public Naij(DbConnection dbCon,HttpClient httpCli, String baseUrl,long sourceId, boolean debug) {
-		dbConnection = dbCon;
+	public Naij(HttpClient httpCli, String baseUrl,long sourceId, boolean debug) {
+	
 		httpClient = httpCli;
 		isDebug = debug;
 		this.sourceId=sourceId;

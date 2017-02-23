@@ -1,4 +1,4 @@
-package com.bluggee;
+package com.bluggee.blogs;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import com.bluggee.DBObject;
+import com.bluggee.DbConnection;
 
 
 public class Content extends DBObject{
