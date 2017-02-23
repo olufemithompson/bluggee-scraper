@@ -64,6 +64,7 @@ import com.bluggee.blogs.TMZ;
 import com.bluggee.blogs.TechCabal;
 import com.bluggee.blogs.TechPoint;
 import com.bluggee.models.Content;
+import com.bluggee.models.RegId;
 import com.bluggee.rss.Feed;
 import com.bluggee.rss.FeedMessage;
 import com.bluggee.rss.RSSFeedWriter;
@@ -101,6 +102,10 @@ public class Application implements CommandLineRunner{
 	
 	@Autowired
 	ContentRepository repository;
+	
+	
+	@Autowired
+	RegIdRepository rgRepository;
 	
     long sourceId = 1;
    
@@ -304,7 +309,7 @@ public class Application implements CommandLineRunner{
 					srcIdBuilder.append("<>");
 				}
 				
-				String src = getSourceName(c.getSource().getId());
+				String src = c.getSource().getName();
 				
 				srcBuilder.append(src);
 				if(i < contents.size()-1){
@@ -343,7 +348,6 @@ public class Application implements CommandLineRunner{
 			    try {
 					httpClient.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -353,95 +357,101 @@ public class Application implements CommandLineRunner{
 	
 	private  ArrayList<String> getRegIds(){
 		ArrayList<String> regs = new ArrayList<String>();
-		Connection connection = null;
-		try {
-			connection = DBObject.getDBConnection(dbConnection);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		PageRequest pageable = new PageRequest(0,500);
+		List<RegId> reggs = rgRepository.loadAll(pageable);
+		for(RegId r : reggs){
+			regs.add(r.getReg());
 		}
-		
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("select reg from reg_id");
-			while (rs.next()) {
-				regs.add( rs.getString("reg"));
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		
-		if (statement != null) {
-			try {
-				statement.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if (connection != null) {
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		System.out.println("sending to "+regs.size() + " devices");
+//		Connection connection = null;
+//		try {
+//			connection = DBObject.getDBConnection(dbConnection);
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		Statement statement = null;
+//		try {
+//			statement = connection.createStatement();
+//			ResultSet rs = statement.executeQuery("select reg from reg_id");
+//			while (rs.next()) {
+//				regs.add( rs.getString("reg"));
+//			}
+//			
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		
+//		if (statement != null) {
+//			try {
+//				statement.close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		if (connection != null) {
+//			try {
+//				connection.close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		return regs;
 	}
 	
 	
 	
 	
-	private  String getSourceName(long id){
-		String name = "";
-		Connection connection = null;
-		try {
-			connection = DBObject.getDBConnection(dbConnection);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("select name from blog_source where id = "+id);
-			while (rs.next()) {
-				name = rs.getString("name");
-				
-				break;
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		
-		if (statement != null) {
-			try {
-				statement.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if (connection != null) {
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		return name;
-	}
+//	private  String getSourceName(long id){
+//		String name = "";
+//		Connection connection = null;
+//		try {
+//			connection = DBObject.getDBConnection(dbConnection);
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		Statement statement = null;
+//		try {
+//			statement = connection.createStatement();
+//			ResultSet rs = statement.executeQuery("select name from blog_source where id = "+id);
+//			while (rs.next()) {
+//				name = rs.getString("name");
+//				
+//				break;
+//			}
+//			
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		
+//		if (statement != null) {
+//			try {
+//				statement.close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		if (connection != null) {
+//			try {
+//				connection.close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		
+//		return name;
+//	}
 	
 	
 	
